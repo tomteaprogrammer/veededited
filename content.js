@@ -1,10 +1,10 @@
 // content.js
 
-// VEED transitions container you mentioned
+// VEED transitions container
 const TRANSITIONS_CONTAINER_SEL =
   '#\\@edit-container > div > div.sc-cYrCKJ.jgwPRz > div.sc-bkgRFv.ekAvJL > div > div > div > div > div > div.sc-jhVUyh.gshlFH';
 
-// names we want to block
+// transition names to hide
 const BLOCKED_NAMES = [
   'Blast',
   'Zoom In & Out',
@@ -23,42 +23,48 @@ const BLOCKED_NAMES = [
   'Cross Warp'
 ];
 
-function removeBlockedInRoot(root = document) {
+// add a CSS rule once
+(function addStyle() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .veed-hide-transition {
+      display: none !important;
+    }
+  `;
+  (document.head || document.documentElement).appendChild(style);
+})();
+
+function hideBlockedInRoot(root = document) {
   const cards = root.querySelectorAll('.sc-ceplVk');
   cards.forEach(card => {
     const label = card.querySelector('.sc-jIpqle, span');
     if (!label) return;
     const text = label.textContent.trim();
     if (BLOCKED_NAMES.includes(text)) {
-      card.remove();
+      // instead of remove(), just add a class
+      card.classList.add('veed-hide-transition');
     }
   });
 }
 
-function removeBlockedGlobal() {
-  removeBlockedInRoot(document);
-}
-
-function removeBlockedInContainer() {
+function runOnce() {
+  hideBlockedInRoot(document);
   const container = document.querySelector(TRANSITIONS_CONTAINER_SEL);
-  if (!container) return;
-
-  removeBlockedInRoot(container);
-
-  const second = container.querySelector(':scope > div:nth-child(2)');
-  if (second) removeBlockedInRoot(second);
+  if (container) hideBlockedInRoot(container);
 }
 
-function runAll() {
-  removeBlockedGlobal();
-  removeBlockedInContainer();
-}
+// initial pass
+runOnce();
 
-// run once
-runAll();
+// observe only the transitions area if we can
+const target = document.querySelector(TRANSITIONS_CONTAINER_SEL) || document.body;
 
-// watch for re-renders
-new MutationObserver(runAll).observe(document.body, {
+new MutationObserver(muts => {
+  // only do work when new nodes are added
+  if (muts.some(m => m.addedNodes && m.addedNodes.length)) {
+    runOnce();
+  }
+}).observe(target, {
   childList: true,
   subtree: true
 });
