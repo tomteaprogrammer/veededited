@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "VEED: customized",
+  "version": "1.0",
+  "description": "Removes the transition cards veed.io editor pages.",
+  "content_scripts": [
+    {
+      "matches": ["https://www.veed.io/edit/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": []
+}
