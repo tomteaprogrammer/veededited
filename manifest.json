@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "VEED: customized",
+  "name": "VEED: keep None and Push Right",
   "version": "1.0",
-  "description": "Removes the transition cards veed.io editor pages.",
+  "description": "Hides all transitions in the VEED editor grid except None and Push Right.",
   "content_scripts": [
     {
       "matches": ["https://www.veed.io/edit/*"],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "permissions": []
